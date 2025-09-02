@@ -21,6 +21,8 @@ model Project {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   boards      Board[]
+  author      User?    @relation("ProjectAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId    Int?
 }
 
 model Board {
@@ -30,6 +32,25 @@ model Board {
   updatedAt DateTime @updatedAt
   projectId Int
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  authorId  Int?
+  author    User?    @relation("BoardAuthor", fields: [authorId], references: [id], onDelete: SetNull)
 
   @@unique([projectId, name])
+  @@index([projectId])
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[] @relation("ProjectAuthor")
+  boards    Board[]   @relation("BoardAuthor")
+}
+
+enum Role {
+  ADMIN
+  USER
 }

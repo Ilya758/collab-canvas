@@ -10,9 +10,9 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 export class ProjectsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createProjectDto: CreateProjectDto) {
+  async create(createProjectDto: CreateProjectDto, userId: number) {
     return await this.prisma.project
-      .create({ data: createProjectDto, select: { id: true } })
+      .create({ data: { ...createProjectDto, authorId: userId }, select: { id: true } })
       .catch((error) => {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           if (error.code === PRISMA_ERROR_CODES.UNIQUE_CONSTRAINT_VIOLATION) {
@@ -24,8 +24,20 @@ export class ProjectsService {
       });
   }
 
-  findAll() {
-    return this.prisma.project.findMany({ include: { boards: true } });
+  findByUserId(userId: number) {
+    return this.prisma.project.findMany({
+      where: {
+        OR: [
+          {
+            authorId: userId,
+          },
+          {
+            authorId: null,
+          },
+        ],
+      },
+      include: { boards: true },
+    });
   }
 
   findOne(id: number) {
@@ -53,9 +65,11 @@ export class ProjectsService {
     const boardsCount = await this.prisma.board.count({
       where: { projectId: id },
     });
-    if (boardsCount > 0) {
+
+    if (boardsCount) {
       throw new ConflictException('Cannot delete project with existing boards');
     }
+
     return this.prisma.project.delete({ where: { id } });
   }
 }

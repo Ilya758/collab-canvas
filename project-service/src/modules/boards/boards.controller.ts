@@ -8,63 +8,94 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { User } from 'generated/prisma';
+import { Action, Resource } from 'src/common/constants';
+import { CheckResourcePolicy } from 'src/common/decorators/check-resource-policy.decorator';
+import { PoliciesGuard } from 'src/common/guards/policies.guard';
 
-import { EntityExistsPipe } from '../../common/pipes/entity-exists.pipe';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 
-@Controller()
+@Controller('projects/:projectId/boards')
+@UseGuards(JwtAuthGuard, PoliciesGuard)
 export class BoardsController {
   constructor(private readonly boardsService: BoardsService) {}
 
-  @Post('projects/:projectId/boards')
+  @Post()
   @HttpCode(HttpStatus.CREATED)
+  @CheckResourcePolicy({
+    action: Action.MANAGE,
+    resource: Resource.PROJECT,
+    resourceIdParam: 'projectId',
+    resourceType: 'project',
+  })
   createForProject(
-    @Param('projectId', EntityExistsPipe('project')) projectId: number,
+    @Param('projectId') projectId: number,
     @Body() createBoardDto: CreateBoardDto,
+    @Req() { user }: Request & { user: User },
   ) {
-    return this.boardsService.create(projectId, createBoardDto);
+    return this.boardsService.create(createBoardDto, projectId, user.id);
   }
 
-  @Get('projects/:projectId/boards')
-  findAllForProject(@Param('projectId', EntityExistsPipe('project')) projectId: number) {
-    return this.boardsService.findAllByProject(projectId);
+  @Get()
+  @CheckResourcePolicy({
+    action: Action.READ,
+    resource: Resource.PROJECT,
+    resourceIdParam: 'projectId',
+    resourceType: 'project',
+  })
+  findAllForProject(
+    @Param('projectId') projectId: number,
+    @Req() { user }: Request & { user: User },
+  ) {
+    return this.boardsService.findAllByProjectId(projectId, user.id);
   }
 
-  @Get('boards')
-  findAll() {
-    return this.boardsService.findAll();
+  @Get(':id')
+  @CheckResourcePolicy({
+    action: Action.READ,
+    resource: Resource.BOARD,
+    resourceIdParam: 'id',
+    resourceType: 'board',
+  })
+  findByProjectId(
+    @Param('projectId') projectId: number,
+    @Param('id') id: number,
+    @Req() { user }: Request & { user: User },
+  ) {
+    return this.boardsService.findByProjectId(projectId, id, user.id);
   }
 
-  @Get('boards/:id')
-  findOne(@Param('id', EntityExistsPipe('board')) id: number) {
-    return this.boardsService.findOne(id);
-  }
-
-  @Patch('boards/:id')
+  @Patch(':id')
+  @CheckResourcePolicy({
+    action: Action.UPDATE,
+    resource: Resource.BOARD,
+    resourceIdParam: 'id',
+    resourceType: 'board',
+  })
   @HttpCode(HttpStatus.NO_CONTENT)
-  update(
-    @Param('id', EntityExistsPipe('board')) id: number,
+  async update(
+    @Param('projectId') projectId: number,
+    @Param('id') id: number,
     @Body() updateBoardDto: UpdateBoardDto,
   ) {
-    return this.boardsService.update(id, updateBoardDto);
+    await this.boardsService.updateInProject(projectId, id, updateBoardDto);
   }
 
-  @Patch('projects/:projectId/boards/:id')
+  @Delete(':id')
+  @CheckResourcePolicy({
+    action: Action.DELETE,
+    resource: Resource.BOARD,
+    resourceIdParam: 'id',
+    resourceType: 'board',
+  })
   @HttpCode(HttpStatus.NO_CONTENT)
-  updateInProject(
-    @Param('projectId', EntityExistsPipe('project')) projectId: number,
-    @Param('id', EntityExistsPipe('board')) id: number,
-    @Body() updateBoardDto: UpdateBoardDto,
-  ) {
-    return this.boardsService.updateInProject(projectId, id, updateBoardDto);
-  }
-
-  @Delete('boards/:id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', EntityExistsPipe('board')) id: number) {
-    return this.boardsService.remove(id);
+  async remove(@Param('projectId') projectId: number, @Param('id') id: number) {
+    await this.boardsService.remove(id, projectId);
   }
 }

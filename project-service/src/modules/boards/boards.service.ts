@@ -10,10 +10,10 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 export class BoardsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(projectId: number, createBoardDto: CreateBoardDto) {
+  async create(createBoardDto: CreateBoardDto, projectId: number, userId: number) {
     return await this.prisma.board
       .create({
-        data: { name: createBoardDto.name, projectId },
+        data: { name: createBoardDto.name, projectId, authorId: userId },
         select: { id: true },
       })
       .catch((error) => {
@@ -31,12 +31,22 @@ export class BoardsService {
     return this.prisma.board.findMany();
   }
 
-  findAllByProject(projectId: number) {
-    return this.prisma.board.findMany({ where: { projectId } });
+  findAllByProjectId(projectId: number, userId: number) {
+    return this.prisma.board.findMany({
+      where: { projectId, authorId: userId },
+      select: { id: true, name: true, authorId: true },
+    });
   }
 
   findOne(id: number) {
     return this.prisma.board.findUnique({ where: { id } });
+  }
+
+  async findByProjectId(projectId: number, id: number, userId: number) {
+    return await this.prisma.board.findUnique({
+      where: { id, authorId: userId, projectId },
+      select: { id: true, projectId: true, name: true, authorId: true },
+    });
   }
 
   async update(id: number, updateBoardDto: UpdateBoardDto) {
@@ -66,7 +76,7 @@ export class BoardsService {
     return await this.update(id, updateBoardDto);
   }
 
-  remove(id: number) {
-    return this.prisma.board.delete({ where: { id } });
+  async remove(id: number, projectId: number) {
+    await this.prisma.board.delete({ where: { id, projectId } });
   }
 }

@@ -50,6 +50,8 @@ export default tseslint.config(
       'import/newline-after-import': 'warn',
       'import/no-duplicates': 'error',
 
+      'prettier/prettier': 'off',
+
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
 
@@ -74,4 +76,3 @@ export default tseslint.config(
     },
   },
 );
-

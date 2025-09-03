@@ -1,14 +1,22 @@
 import { z } from 'zod';
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  CORS_ALLOWED_HEADERS: z.string().optional(),
+  CORS_CREDENTIALS: z
+    .string()
+    .optional()
+    .transform((v) => v === 'true'),
+  CORS_EXPOSED_HEADERS: z.string().optional(),
+  CORS_METHODS: z.string().optional(),
+  CORS_ORIGIN: z.string().optional(),
+  DATABASE_URL: z.string().url().optional(),
+  ENABLE_SWAGGER: z.string().optional(),
+  NODE_ENV: z.enum(['development', 'production']).default('development'),
   PORT: z
     .string()
     .regex(/^\d+$/)
     .transform((v) => Number(v))
     .default('3000'),
-  DATABASE_URL: z.string().url().optional(),
-  ENABLE_SWAGGER: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

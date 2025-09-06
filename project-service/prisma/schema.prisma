@@ -26,14 +26,15 @@ model Project {
 }
 
 model Board {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   projectId Int
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Restrict)
   authorId  Int?
-  author    User?    @relation("BoardAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  author    User?     @relation("BoardAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  elements  Element[]
 
   @@unique([projectId, name])
   @@index([projectId])
@@ -48,9 +49,31 @@ model User {
   updatedAt DateTime  @updatedAt
   projects  Project[] @relation("ProjectAuthor")
   boards    Board[]   @relation("BoardAuthor")
+  elements  Element[]
+}
+
+model Element {
+  id        String      @id @default(cuid())
+  type      ElementType
+  x         Float
+  y         Float
+  width     Float
+  height    Float
+  content   String?
+  boardId   Int
+  userId    Int
+  user      User        @relation(fields: [userId], references: [id])
+  board     Board       @relation(fields: [boardId], references: [id])
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
 
 enum Role {
   ADMIN
   USER
+}
+
+enum ElementType {
+  RECTANGLE
+  TEXT
 }

@@ -10,6 +10,7 @@ import { ElementsModule } from './modules/elements/elements.module';
 import { HealthController } from './modules/health/health.controller';
 import { PrismaHealthIndicator } from './modules/health/prisma.health';
 import { ProjectsModule } from './modules/projects/projects.module';
+import { RealtimeModule } from './modules/realtime/realtime.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({

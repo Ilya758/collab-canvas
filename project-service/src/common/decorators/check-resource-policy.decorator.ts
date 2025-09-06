@@ -6,7 +6,7 @@ export interface ResourcePolicyConfig {
   action: Action;
   resource: Resource;
   resourceIdParam: string;
-  resourceType: 'board' | 'project' | 'user';
+  resourceType: 'board' | 'element' | 'project' | 'user';
 }
 
 export const CHECK_RESOURCE_POLICY_KEY = 'check_resource_policy';

@@ -9,6 +9,7 @@ type AppSubjects =
   | Subjects<{
       Project: { id: number; authorId: number | null };
       Board: { id: number; authorId: number | null };
+      Element: { id: string; userId: number | null };
       User: { id: number; role: Role };
     }>
   | 'all';
@@ -33,6 +34,14 @@ export class CaslAbilityFactory {
 
       can(Action.READ, Resource.BOARD, {
         authorId: null,
+      });
+
+      can(Action.MANAGE, Resource.ELEMENT, {
+        userId: user.id,
+      });
+
+      can(Action.READ, Resource.ELEMENT, {
+        userId: null,
       });
 
       can(Action.READ, Resource.USER, { id: user.id });

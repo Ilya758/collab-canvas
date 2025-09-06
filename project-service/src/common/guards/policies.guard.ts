@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 import { User } from 'generated/prisma';
 
 import { PrismaService } from '../../prisma/prisma.service';
-import { AppAbility,CaslAbilityFactory } from '../abilities/casl-ability.factory';
+import { AppAbility, CaslAbilityFactory } from '../abilities/casl-ability.factory';
 import { CHECK_POLICIES_KEY } from '../decorators/check-policies.decorator';
 import {
   CHECK_RESOURCE_POLICY_KEY,
@@ -85,15 +85,6 @@ export class PoliciesGuard implements CanActivate {
 
     switch (config.resourceType) {
       case 'board': {
-        const projectId = Number(request.params.projectId);
-
-        if (
-          isNaN(projectId) ||
-          !(await this.prismaService.project.findUnique({ where: { id: projectId } }))
-        ) {
-          throw new NotFoundException('Resource not found');
-        }
-
         resource = await this.prismaService.board.findUnique({
           where: { id: resourceId },
         });
@@ -110,6 +101,13 @@ export class PoliciesGuard implements CanActivate {
       case 'user': {
         resource = await this.prismaService.user.findUnique({
           where: { id: resourceId },
+        });
+        break;
+      }
+
+      case 'element': {
+        resource = await this.prismaService.element.findUnique({
+          where: { id: request.params[config.resourceIdParam] },
         });
         break;
       }

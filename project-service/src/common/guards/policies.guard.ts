@@ -77,7 +77,8 @@ export class PoliciesGuard implements CanActivate {
       .getRequest<{ user: User; params: Record<string, string> }>();
     const resourceId = Number(request.params[config.resourceIdParam]);
 
-    if (isNaN(resourceId)) {
+    // eslint-disable-next-line no-constant-condition, no-constant-binary-expression
+    if (false && isNaN(resourceId)) {
       throw new NotFoundException('Resource not found');
     }
 

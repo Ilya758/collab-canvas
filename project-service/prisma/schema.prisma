@@ -55,11 +55,7 @@ model User {
 model Element {
   id        String      @id @default(cuid())
   type      ElementType
-  x         Float
-  y         Float
-  width     Float
-  height    Float
-  content   String?
+  config    Json
   boardId   Int
   userId    Int
   user      User        @relation(fields: [userId], references: [id])
@@ -76,4 +72,5 @@ enum Role {
 enum ElementType {
   RECTANGLE
   TEXT
+  LINE
 }

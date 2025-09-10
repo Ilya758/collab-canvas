@@ -1,22 +1,10 @@
-import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsObject } from 'class-validator';
 import { ElementType } from 'generated/prisma';
 
 export class ElementDto {
   @IsEnum(ElementType)
   type: ElementType;
 
-  @IsNumber()
-  x: number;
-
-  @IsNumber()
-  y: number;
-
-  @IsNumber()
-  width: number;
-
-  @IsNumber()
-  height: number;
-
-  @IsString()
-  content: string;
+  @IsObject()
+  config: Record<string, any>;
 }

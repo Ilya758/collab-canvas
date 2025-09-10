@@ -14,12 +14,9 @@ export class ElementsService {
   async create(elementDto: ElementDto, boardId: number, userId: number) {
     const element = await this.prisma.element.create({
       data: {
-        ...elementDto,
         boardId,
+        ...elementDto,
         userId,
-      },
-      select: {
-        id: true,
       },
     });
 

@@ -37,15 +37,14 @@ export class RpcToHttpExceptionFilter implements ExceptionFilter {
   };
 
   catch(exception: RpcError | HttpException, host: ArgumentsHost) {
-    if (exception instanceof HttpException) {
-      throw exception;
-    }
-
     const response = host.switchToHttp().getResponse<Response>();
 
-    if (typeof exception.code !== 'number') {
-      const httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-      throw new HttpException('An unexpected error occurred.', httpStatus);
+    if (exception instanceof HttpException) {
+      return response.status(exception.getStatus()).json({
+        statusCode: exception.getStatus(),
+        message: exception.message,
+        timestamp: new Date().toISOString(),
+      });
     }
 
     const message =

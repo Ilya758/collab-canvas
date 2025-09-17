@@ -1,0 +1,136 @@
+import "google/protobuf/empty.proto";
+
+syntax = "proto3";
+
+package workspace;
+
+service WorkspaceService {
+  rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
+  rpc FindProjectsByUserId(FindProjectsByUserIdRequest) returns (stream Project);
+  rpc FindProjectById(FindProjectByIdRequest) returns (Project);
+  rpc UpdateProject(UpdateProjectRequest) returns (google.protobuf.Empty);
+  rpc DeleteProject(DeleteProjectRequest) returns (google.protobuf.Empty);
+}
+
+message CreateProjectResponse {
+  int32 id = 1;
+}
+
+message FindProjectsByUserIdRequest {
+  int32 userId = 1;
+}
+
+message Project {
+  int32 id = 1;
+  string name = 2;
+  optional string description = 3;
+  int32 authorId = 4;
+  string createdAt = 5;
+  string updatedAt = 6;
+}
+
+message CreateProjectRequest {
+  string name = 1;
+  optional string description = 2;
+}
+
+message UpdateProjectRequest {
+  int32 id = 1;
+  string name = 2;
+  optional string description = 3;
+}
+
+message DeleteProjectRequest {
+  int32 id = 1;
+}
+
+message FindProjectByIdRequest {
+  int32 id = 1;
+}
+
+service BoardService {
+  rpc CreateBoard(CreateBoardRequest) returns (CreateBoardResponse);
+  rpc FindBoardsByProjectId(FindBoardsByProjectIdRequest) returns (stream Board);
+  rpc FindBoardById(FindBoardByIdRequest) returns (Board);
+  rpc UpdateBoard(UpdateBoardRequest) returns (google.protobuf.Empty);
+  rpc DeleteBoard(DeleteBoardRequest) returns (google.protobuf.Empty);
+}
+
+message CreateBoardRequest {
+  string name = 1;
+  int32 projectId = 2;
+}
+
+message CreateBoardResponse {
+  int32 id = 1;
+}
+
+message FindBoardsByProjectIdRequest {
+  int32 projectId = 1;
+}
+
+message FindBoardByIdRequest {
+  int32 id = 1;
+}
+
+message UpdateBoardRequest {
+  int32 id = 1;
+  string name = 2;
+}
+
+message Board {
+  int32 id = 1;
+  string name = 2;
+  int32 projectId = 3;
+  int32 authorId = 4;
+  string createdAt = 5;
+  string updatedAt = 6;
+}
+
+message DeleteBoardRequest {
+  int32 id = 1;
+  int32 projectId = 2;
+}
+
+service ElementService {
+  rpc CreateElement(CreateElementRequest) returns (CreateElementResponse);
+  rpc FindElementsByBoardId(FindElementsByBoardIdRequest) returns (stream Element);
+  rpc FindElementById(FindElementByIdRequest) returns (Element);
+  rpc UpdateElement(UpdateElementRequest) returns (google.protobuf.Empty);
+  rpc DeleteElement(DeleteElementRequest) returns (google.protobuf.Empty);
+}
+
+message CreateElementRequest {
+  string type = 1;
+  int32 boardId = 2;
+  string config = 3;
+}
+
+message CreateElementResponse {
+  string id = 1;
+}
+
+message FindElementsByBoardIdRequest {
+  int32 boardId = 1;
+}
+
+message FindElementByIdRequest {
+  string id = 1;
+}
+
+message UpdateElementRequest {
+  string id = 1;
+  string config = 2;
+}
+
+message DeleteElementRequest {
+  string id = 1;
+  int32 boardId = 2;
+}
+
+message Element {
+  string id = 1;
+  string type = 2;
+  int32 boardId = 3;
+  string config = 4;
+}

@@ -7,7 +7,6 @@ package workspace;
 service WorkspaceService {
   rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
   rpc FindProjectsByUserId(FindProjectsByUserIdRequest) returns (stream Project);
-  rpc FindProjectById(FindProjectByIdRequest) returns (Project);
   rpc UpdateProject(UpdateProjectRequest) returns (google.protobuf.Empty);
   rpc DeleteProject(DeleteProjectRequest) returns (google.protobuf.Empty);
 }
@@ -44,14 +43,9 @@ message DeleteProjectRequest {
   int32 id = 1;
 }
 
-message FindProjectByIdRequest {
-  int32 id = 1;
-}
-
 service BoardService {
   rpc CreateBoard(CreateBoardRequest) returns (CreateBoardResponse);
   rpc FindBoardsByProjectId(FindBoardsByProjectIdRequest) returns (stream Board);
-  rpc FindBoardById(FindBoardByIdRequest) returns (Board);
   rpc UpdateBoard(UpdateBoardRequest) returns (google.protobuf.Empty);
   rpc DeleteBoard(DeleteBoardRequest) returns (google.protobuf.Empty);
 }
@@ -69,13 +63,10 @@ message FindBoardsByProjectIdRequest {
   int32 projectId = 1;
 }
 
-message FindBoardByIdRequest {
-  int32 id = 1;
-}
-
 message UpdateBoardRequest {
   int32 id = 1;
-  string name = 2;
+  int32 projectId = 2;
+  string name = 3;
 }
 
 message Board {
@@ -95,7 +86,6 @@ message DeleteBoardRequest {
 service ElementService {
   rpc CreateElement(CreateElementRequest) returns (CreateElementResponse);
   rpc FindElementsByBoardId(FindElementsByBoardIdRequest) returns (stream Element);
-  rpc FindElementById(FindElementByIdRequest) returns (Element);
   rpc UpdateElement(UpdateElementRequest) returns (google.protobuf.Empty);
   rpc DeleteElement(DeleteElementRequest) returns (google.protobuf.Empty);
 }
@@ -114,13 +104,11 @@ message FindElementsByBoardIdRequest {
   int32 boardId = 1;
 }
 
-message FindElementByIdRequest {
-  string id = 1;
-}
-
 message UpdateElementRequest {
   string id = 1;
   string config = 2;
+  int32 boardId = 3;
+  string type = 4;
 }
 
 message DeleteElementRequest {

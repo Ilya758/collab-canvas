@@ -54,11 +54,6 @@ export class ProjectsController {
       .pipe(toArray());
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: number, @GrpcUserMetadata() metadata: Metadata) {
-    return this.workspaceService.findProjectById({ id }, metadata);
-  }
-
   @HttpCode(HttpStatus.NO_CONTENT)
   @Patch(':id')
   update(

@@ -17,10 +17,6 @@ export interface WorkspaceService {
     data: { userId: number },
     metadata?: Metadata,
   ): Observable<Project[]>;
-  findProjectById(
-    data: { id: number },
-    metadata?: Metadata,
-  ): Observable<Project>;
   updateProject(data: UpdateProjectDto, metadata?: Metadata): Observable<void>;
   deleteProject(data: { id: number }, metadata?: Metadata): Observable<void>;
 }
@@ -34,10 +30,6 @@ export interface BoardService {
     data: { projectId: number },
     metadata?: Metadata,
   ): Observable<Board[]>;
-  findBoardById(
-    data: { id: number; projectId: number },
-    metadata?: Metadata,
-  ): Observable<Board>;
   updateBoard(data: UpdateBoardDto, metadata?: Metadata): Observable<void>;
   deleteBoard(
     data: { id: number; projectId: number },
@@ -54,10 +46,6 @@ export interface ElementService {
     data: { boardId: number },
     metadata?: Metadata,
   ): Observable<Element[]>;
-  findElementById(
-    data: { id: string; boardId: number },
-    metadata?: Metadata,
-  ): Observable<Element>;
   updateElement(
     data: ElementDto & { id: string },
     metadata?: Metadata,

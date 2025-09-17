@@ -60,15 +60,6 @@ export class ElementsController {
       .pipe(toArray());
   }
 
-  @Get(':id')
-  async findOne(
-    @Param('boardId') boardId: number,
-    @Param('id') id: string,
-    @GrpcUserMetadata() metadata: Metadata,
-  ) {
-    return this.elementsService.findElementById({ boardId, id }, metadata);
-  }
-
   @Patch(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   update(

@@ -60,15 +60,6 @@ export class BoardsController {
       .pipe(toArray());
   }
 
-  @Get(':id')
-  findByProjectId(
-    @Param('projectId') projectId: number,
-    @Param('id') id: number,
-    @GrpcUserMetadata() metadata: Metadata,
-  ) {
-    return this.boardService.findBoardById({ id, projectId }, metadata);
-  }
-
   @Patch(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async update(
@@ -77,7 +68,7 @@ export class BoardsController {
     @Body() updateBoardDto: UpdateBoardDto,
     @GrpcUserMetadata() metadata: Metadata,
   ) {
-    return await this.boardService.updateBoard(
+    return this.boardService.updateBoard(
       {
         ...updateBoardDto,
         id,
@@ -89,11 +80,11 @@ export class BoardsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(
+  remove(
     @Param('projectId') projectId: number,
     @Param('id') id: number,
     @GrpcUserMetadata() metadata: Metadata,
   ) {
-    return await this.boardService.deleteBoard({ id, projectId }, metadata);
+    return this.boardService.deleteBoard({ id, projectId }, metadata);
   }
 }

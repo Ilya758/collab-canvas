@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 
 import { ElementDto } from './dto/element-dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import { type ClientGrpc } from '@nestjs/microservices';
 import { ElementService } from 'src/common/interfaces/workspace';
 import { GrpcUserMetadata } from 'src/common/decorators/grpc-user-metadata.decorator';

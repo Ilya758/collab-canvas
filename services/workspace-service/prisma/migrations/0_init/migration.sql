@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "workspace";
+
 -- CreateEnum
 CREATE TYPE "workspace"."ElementType" AS ENUM ('RECTANGLE', 'TEXT', 'LINE');
 
@@ -52,3 +55,4 @@ ALTER TABLE "workspace"."Board" ADD CONSTRAINT "Board_projectId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "workspace"."Element" ADD CONSTRAINT "Element_boardId_fkey" FOREIGN KEY ("boardId") REFERENCES "workspace"."Board"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+

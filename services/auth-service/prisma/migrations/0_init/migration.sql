@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "auth";
+
 -- CreateEnum
 CREATE TYPE "auth"."Role" AS ENUM ('ADMIN', 'USER');
 
@@ -15,3 +18,4 @@ CREATE TABLE "auth"."User" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "auth"."User"("email");
+

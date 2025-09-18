@@ -1,11 +1,13 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["workspace"]
 }
 
 model Project {
@@ -16,6 +18,8 @@ model Project {
   updatedAt   DateTime @updatedAt
   authorId    Int?
   boards      Board[]
+
+  @@schema("workspace")
 }
 
 model Board {
@@ -30,6 +34,7 @@ model Board {
 
   @@unique([projectId, name])
   @@index([projectId])
+  @@schema("workspace")
 }
 
 model Element {
@@ -41,10 +46,14 @@ model Element {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   board     Board       @relation(fields: [boardId], references: [id])
+
+  @@schema("workspace")
 }
 
 enum ElementType {
   RECTANGLE
   TEXT
   LINE
+
+  @@schema("workspace")
 }

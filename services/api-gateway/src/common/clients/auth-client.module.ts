@@ -8,12 +8,12 @@ import { join } from 'path';
     ClientsModule.registerAsync([
       {
         name: 'AUTH_SERVICE',
-        useFactory: () => ({
+        useFactory: (configService: ConfigService) => ({
           transport: Transport.GRPC,
           options: {
             package: 'auth',
             protoPath: join(__dirname, '../../../../../proto/auth.proto'),
-            url: '0.0.0.0:50051',
+            url: configService.get<string>('AUTH_SERVICE_URL'),
           },
         }),
         inject: [ConfigService],

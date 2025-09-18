@@ -8,12 +8,12 @@ import { join } from 'path';
     ClientsModule.registerAsync([
       {
         name: 'WORKSPACE_SERVICE',
-        useFactory: () => ({
+        useFactory: (configService: ConfigService) => ({
           transport: Transport.GRPC,
           options: {
             package: 'workspace',
             protoPath: join(__dirname, '../../../../../proto/workspace.proto'),
-            url: '0.0.0.0:50052',
+            url: configService.get<string>('WORKSPACE_SERVICE_URL'),
           },
         }),
         inject: [ConfigService],

@@ -1,17 +1,83 @@
-version: '3.8'
-
 services:
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    env_file:
+      - ./.env
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    restart: always
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
   postgres:
-    image: postgres:14
-    container_name: collab_postgres_db
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: collab_canvas
+    container_name: postgres
+    image: postgres:15
+    env_file:
+      - ./.env
     ports:
       - '5432:5432'
+    restart: unless-stopped
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
+  
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: .
+      dockerfile: ./services/api-gateway/Dockerfile
+    ports:
+      - 3000:3000
+      - 9229:9229
+    env_file:
+      - ./services/api-gateway/.env
+    restart: unless-stopped
+    volumes:
+      - ./services/api-gateway:/app/services/api-gateway
+      - ./proto:/app/proto
+      - /app/services/api-gateway/node_modules
+    depends_on:
+      - auth-service
+      - workspace-service
+
+  auth-service:
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: ./services/auth-service/Dockerfile
+    ports:
+      - 3001:3001
+    env_file:
+      - ./services/auth-service/.env
+    restart: unless-stopped
+    volumes:
+      - ./services/auth-service:/app/services/auth-service
+      - ./proto:/app/proto
+      - /app/services/auth-service/node_modules
+    depends_on:
+      - postgres
+    command: sh -c "npx prisma migrate deploy && yarn start:dev"
+
+  workspace-service:
+    container_name: workspace-service
+    build:
+      context: .
+      dockerfile: ./services/workspace-service/Dockerfile
+    ports:
+      - 3002:3002
+    env_file:
+      - ./services/workspace-service/.env
+    restart: unless-stopped
+    volumes:
+      - ./services/workspace-service:/app/services/workspace-service
+      - ./proto:/app/proto
+      - /app/services/workspace-service/node_modules
+    depends_on:
+      - postgres
+    command: sh -c "npx prisma migrate deploy && yarn start:dev"
 
 volumes:
-  postgres_data:
+  db-data:
+  pgadmin-data:

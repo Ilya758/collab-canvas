@@ -66,6 +66,7 @@ services:
       dockerfile: ./services/auth-service/Dockerfile
     ports:
       - 3001:3001
+      - 50051:50051
     env_file:
       - ./services/auth-service/.env
     restart: unless-stopped
@@ -84,6 +85,7 @@ services:
       dockerfile: ./services/workspace-service/Dockerfile
     ports:
       - 3002:3002
+      - 50052:50052
     env_file:
       - ./services/workspace-service/.env
     restart: unless-stopped
@@ -92,7 +94,10 @@ services:
       - ./proto:/app/proto
       - /app/services/workspace-service/node_modules
     depends_on:
-      - postgres
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     command: sh -c "npx prisma migrate deploy && yarn start:dev"
 
   realtime-service:

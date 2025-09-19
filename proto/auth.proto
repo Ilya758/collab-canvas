@@ -5,6 +5,7 @@ package auth;
 service AuthService {
   rpc SignUp(AuthRequest) returns (AuthResponse);
   rpc SignIn(AuthRequest) returns (AuthResponse);
+  rpc ValidateToken(ValidateTokenRequest) returns (User);
 }
 
 message AuthRequest {
@@ -14,4 +15,21 @@ message AuthRequest {
 
 message AuthResponse {
   string accessToken = 1;
+}
+
+message ValidateTokenRequest {
+  string accessToken = 1;
+}
+
+enum Role {
+  ADMIN = 0;
+  USER = 1;
+}
+
+message User {
+  int32 id = 1;
+  string email = 2;
+  Role role = 3;
+  string createdAt = 4;
+  string updatedAt = 5;
 }

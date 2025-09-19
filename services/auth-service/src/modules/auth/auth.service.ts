@@ -1,11 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { RpcException } from '@nestjs/microservices';
 import { status as GrpcStatus } from '@grpc/grpc-js';
 
 import { AuthDto } from './dto/auth.dto';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { ValidateTokenDto } from './dto/validate-token.dto';
+import { User } from 'generated/prisma';
 
 @Injectable()
 export class AuthService {
@@ -70,5 +72,31 @@ export class AuthService {
         role: user.role,
       }),
     };
+  }
+
+  async validateToken({ accessToken }: ValidateTokenDto): Promise<Omit<User, 'password'>> {
+    try {
+      const payload = this.jwtService.verify(accessToken);
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+      });
+
+      if (!user) {
+        throw new RpcException({
+          code: GrpcStatus.UNAUTHENTICATED,
+          message: 'Invalid token',
+        });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password: _, ...validatedUser } = user;
+
+      return validatedUser;
+    } catch (e) {
+      throw new RpcException({
+        code: GrpcStatus.UNAUTHENTICATED,
+        message: 'Invalid token',
+      });
+    }
   }
 }

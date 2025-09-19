@@ -12,7 +12,6 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-    @Inject('RABBITMQ_SERVICE') private readonly client: ClientProxy,
   ) {}
 
   async signUp({ email, password }: AuthDto): Promise<{ accessToken: string }> {
@@ -34,11 +33,6 @@ export class AuthService {
         password: hashedPassword,
         role: 'USER',
       },
-    });
-
-    this.client.emit('user_created', {
-      userId: id,
-      email,
     });
 
     return {

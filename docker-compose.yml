@@ -22,6 +22,23 @@ services:
     restart: unless-stopped
     volumes:
       - db-data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: collab_rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+      interval: 5s
+      timeout: 15s
+      retries: 3
   
   api-gateway:
     container_name: api-gateway
@@ -78,6 +95,28 @@ services:
       - postgres
     command: sh -c "npx prisma migrate deploy && yarn start:dev"
 
+  realtime-service:
+    container_name: realtime-service
+    build:
+      context: .
+      dockerfile: ./services/realtime-service/Dockerfile
+    ports:
+      - 3003:3003
+    env_file:
+      - ./services/realtime-service/.env
+    restart: unless-stopped
+    volumes:
+      - ./services/realtime-service:/app/services/realtime-service
+      - ./proto:/app/proto
+      - /app/services/realtime-service/node_modules
+    depends_on:
+      api-gateway:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    command: sh -c "yarn start:dev"
+
 volumes:
   db-data:
   pgadmin-data:
+  rabbitmq-data:
